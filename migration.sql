@@ -38,4 +38,4 @@ CREATE TABLE adCategories (
 );
 
 INSERT INTO categories (category) VALUES
-('cars'), ('electronics'), ('furniture'), ('toys'), ('outdoor'), ('sporting goods'), ('collectibles'), ('musical instruments'), ('tools');
+('cars'), ('collectibles'), ('electronics'), ('furniture'), ('musical'), ('outdoor'), ('sporting'), ('tools'), ('toys');
