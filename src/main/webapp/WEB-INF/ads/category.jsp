@@ -1,80 +1,65 @@
+<%--=============================--%>
+<%--  http://localhost:8080/ads/create   --%>
+<%--=============================--%>
+
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+
+
+
+
+
 <head>
     <jsp:include page="/WEB-INF/partials/head.jsp">
         <jsp:param name="title" value="Welcome to my site!" />
     </jsp:include>
-    <link rel="stylesheet" type="text/css" href="../../css/main.css">
     <title>Category Ads</title>
 </head>
 <body>
 <jsp:include page="/WEB-INF/partials/navbar.jsp" />
 
-<div class="row no-gutters">
-    <div id="sideImg" class="col-2 h-100 pt-4 sticky-top">
-        <div >
-            <nav id="side-nav" class="nav flex-column">
-                <a class="w-text nav-link active pl-5" href="/category?value=0">All</a>
-                <a class="w-text nav-link pl-5" href="/category?value=1"><i class="fa fa-bicycle"></i> Sports</a>
-                <a class="w-text nav-link pl-5" href="/category?value=2"><i class="fa fa-tree"></i> Camping</a>
-                <a class="w-text nav-link pl-5" href="/category?value=3"><i class="fa fa-laptop"></i> Computers</a>
-                <a class="w-text nav-link pl-5" href="/category?value=4"><i class="fa fa-mobile"></i> Phones</a>
-                <a class="w-text nav-link pl-5" href="/category?value=5"><i class="fa fa-briefcase"></i> Jobs</a>
-                <a class="w-text nav-link pl-5" href="/category?value=6"><i class="fa fa-shopping-bag"></i> Clothing</a>
-                <a class="w-text nav-link pl-5" href="/category?value=7"><i class="fa fa-car"></i> Cars</a>
-                <a class="w-text nav-link pl-5" href="/category?value=8"><i class="fa fa-bed"></i> Furniture</a>
-                <a class="w-text nav-link pl-5" href="/category?value=9">Other</a>
+<div class="row">
+    <div class="col-2 bg-light h-100 pt-4">
+        <div class="container">
+            <nav class="nav flex-column">
+                <a class="nav-link active" href="/category">All</a>
+                <a class="nav-link" href="/category?value=1">Cars</a>
+                <a class="nav-link" href="/category?value=2">Collectibles</a>
+                <a class="nav-link" href="/category?value=3">Electronics</a>
+                <a class="nav-link" href="/category?value=4">Furniture</a>
+                <a class="nav-link" href="/category?value=5">Musical</a>
+                <a class="nav-link" href="/category?value=6">Outdoor</a>
+                <a class="nav-link" href="/category?value=7">Sporting</a>
+                <a class="nav-link" href="/category?value=8">Tools</a>
+                <a class="nav-link" href="/category?value=9">Toys</a>
             </nav>
         </div>
     </div>
 
     <div class="col-10">
-        <div class="container pb-5 pt-5">
-            <c:if test="${cat == 'sports'}" >
-                <h1 class="w-text">All ads related to Sports</h1>
-            </c:if>
-            <c:if test="${cat == 'camping'}" >
-                <h1 class="w-text">All ads related to Camping</h1>
-            </c:if>
-            <c:if test="${cat == 'computers'}" >
-                <h1 class="w-text">All ads related to Computers</h1>
-            </c:if>
-            <c:if test="${cat == 'phones'}" >
-                <h1 class="w-text">All ads related to Phones</h1>
-            </c:if>
-            <c:if test="${cat == 'jobs'}" >
-                <h1 class="w-text">All ads related to Jobs</h1>
-            </c:if>
-            <c:if test="${cat == 'clothing'}" >
-                <h1 class="w-text">All ads related to Clothing</h1>
-            </c:if>
-            <c:if test="${cat == 'cars'}" >
-                <h1 class="w-text">All ads related to Cars</h1>
-            </c:if>
-            <c:if test="${cat == 'furniture'}" >
-                <h1 class="w-text">All ads related to Furniture</h1>
-            </c:if>
-            <c:if test="${cat == 'other'}" >
-                <h1 class="w-text">All ads related to Other</h1>
-            </c:if>
-            <p class="w-text">Listed below are ads seperated by category. Refer to the side navigation on the left or use the search bar above for a specific search.</p>
+        <div class="container">
+            <h1>All the category of Ads</h1>
+            <p>Check It Out</p>
+            <p>----------------------------------------------------------------------------------</p>
             <c:forEach var="ad" items="${catAd}">
-                <a class="blk" href="/viewAd?adId=${ad.id}">
-                    <div class="cards mr-3 mb-3">
+
+                <a href="/viewAd?adId=${ad.id}">
+                    <div style="border: 1px solid grey; display: block; float: left; width: 30%; margin-right: 10px; height: 220px;" class="col-md-4">
                         <h2>${ad.title}</h2>
                         <p>${ad.description}</p>
+                        <p>Created On: ${ad.dateMade} by ${ad.username}</p>
                         <p>Categories: ${ad.catString}</p>
-                        <br>
-                        <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
                     </div>
                 </a>
+
             </c:forEach>
+
         </div>
-        <jsp:include page="/WEB-INF/partials/js-script.jsp" />
-        <jsp:include page="/WEB-INF/partials/footer.jsp" />
     </div>
+
 </div>
 </body>
 </html>

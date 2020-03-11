@@ -3,6 +3,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
+
     <jsp:include page="/WEB-INF/partials/head.jsp">
         <jsp:param name="title" value="Welcome to my site!" />
     </jsp:include>
@@ -30,7 +31,7 @@
     </div>
 
     <form class="row pt-4" action="/ads" method="GET">
-        <a class="red-hover w-text" href="/category?value=0">>> VIEW ALL RECENT ADS</a>
+        <a class="red-hover w-text" href="category?value=0">Recent Ads</a>
     </form>
     <div class="scrollBx ">
         <c:forEach var="ad" items="${all}">
@@ -47,7 +48,7 @@
     </div>
 
     <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=7">>> CARS</a>
+        <a class="red-hover w-text" href="/category?value=1">Cars</a>
     </form>
     <div class="scrollBx">
         <c:forEach var="ad" items="${cars}">
@@ -64,10 +65,10 @@
     </div>
 
     <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=3">>> COMPUTERS</a>
+        <a class="red-hover w-text" href="/category?value=8"> Sporting</a>
     </form>
     <div class="scrollBx">
-        <c:forEach var="ad" items="${computers}">
+        <c:forEach var="ad" items="${sporting}">
             <a class="blk" href="/viewAd?adId=${ad.id}">
                 <div class="cards mr-2">
                     <h2>${ad.title}</h2>
@@ -81,7 +82,7 @@
     </div>
 
     <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=5">>> JOBS</a>
+        <a class="red-hover w-text" href="/category?value=2"> Collectibles</a>
     </form>
     <div class="scrollBx">
         <c:forEach var="ad" items="${jobs}">
@@ -97,8 +98,8 @@
         </c:forEach>
     </div>
 
-    <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=8">>> FURNITURE</a>
+    <form class="row pt-4" action="category" method="GET">
+        <a class="red-hover w-text" href="/category?value=8"> Furniture</a>
     </form>
     <div class="scrollBx">
         <c:forEach var="ad" items="${furniture}">
