@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 
 public class CreateAdServlet extends HttpServlet {
 
-    private String myPath = "Library/Caches/IntelliJIdea2019.3/tomcat/Tomcat_9_0_311_adlister_7/work/Catalina/localhost/ROOT/org/apache/jsp/WEB_002dINF/ads/img";
+    private String myPath = "/img/";
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         if (request.getSession().getAttribute("user") == null) {
