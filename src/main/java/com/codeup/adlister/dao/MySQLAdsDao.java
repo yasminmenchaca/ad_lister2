@@ -1,26 +1,22 @@
 package com.codeup.adlister.dao;
-
+//import com.codeup.adlister.Config;
 import com.codeup.adlister.models.Ad;
 import com.mysql.cj.jdbc.Driver;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MySQLAdsDao implements Ads {
     private Connection connection = null;
-    private Config config = new Config();
 
     public MySQLAdsDao(Config config) {
         try {
             DriverManager.registerDriver(new Driver());
             connection = DriverManager.getConnection(
-                    config.getUrl(),
-                    config.getUser(),
-                    config.getPassword()
+                config.getUrl(),
+                config.getUser(),
+                config.getPassword()
             );
         } catch (SQLException e) {
             throw new RuntimeException("Error connecting to the database!", e);
@@ -31,78 +27,22 @@ public class MySQLAdsDao implements Ads {
     public List<Ad> all() {
         PreparedStatement stmt = null;
         try {
-            stmt = connection.prepareStatement("SELECT ads.id, ads.user_id, users.username, ads.title, ads.description, ads.dateMade, ads.catString\n" +
-                    "FROM ads\n" +
-                    "JOIN users\n" +
-                    "ON users.id = ads.user_id;");
+
+//            stmt = connection.prepareStatement("SELECT ads.*, c.category_name FROM ads JOIN pivot_categories pc ON ads.id = pc.ads_id JOIN categories c ON pc.categories_id = c.id");
+
+//            stmt = connection.prepareStatement("SELECT * FROM ads JOIN pivot_media on ads.id = pivot_media.ad_id join media on pivot_media.media_id = media.id order by ad_id");
+
+            stmt = connection.prepareStatement("SELECT * FROM ads   " +
+                    "JOIN pivot_categories pc ON ads.id = pc.ads_id   " +
+                    "JOIN categories c ON pc.categories_id = c.id   " +
+                    "join pivot_media  on ads.id = pivot_media.ad_id   " +
+                    "join media     on pivot_media.media_id = media.id  " +
+                    "order by ad_id;");
+
             ResultSet rs = stmt.executeQuery();
-            List<Ad> allAds = new ArrayList<>();
-            while (rs.next()) {
-                Ad newAd = new Ad(
-                        rs.getLong("id"),
-                        rs.getLong("user_id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getString("username"),
-                        rs.getString("dateMade"),
-                        rs.getString("catString")
-                );
-                allAds.add(newAd);
-            }
-            return allAds;
+            return createAdsForMain(rs);
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving all ads.", e);
-        }
-    }
-
-    @Override
-    public List<Ad> selWhile(Long catId) {
-        PreparedStatement stmt = null;
-        try {
-            stmt = connection.prepareStatement("SELECT ads.id, ads.user_id, users.username, ads.title, ads.description, ads.dateMade, ads.catString, adCategories.category_id \n" +
-                    "FROM ads\n" +
-                    "JOIN users\n" +
-                    "ON users.id = ads.user_id\n" +
-                    "JOIN adCategories\n" +
-                    "ON adCategories.ad_id = ads.id\n" +
-                    "WHERE category_id = " + catId + ";");
-            ResultSet rs = stmt.executeQuery();
-            List<Ad> allAds = new ArrayList<>();
-            while (rs.next()) {
-                Ad newAd = new Ad(
-                        rs.getLong("id"),
-                        rs.getLong("user_id"),
-                        rs.getString("title"),
-                        rs.getString("description"),
-                        rs.getString("username"),
-                        rs.getString("dateMade"),
-                        rs.getString("catString"),
-                        rs.getLong("category_id")
-                );
-                allAds.add(newAd);
-            }
-            return allAds;
-        } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving all ads.", e);
-        }
-    }
-
-    @Override
-    public Long insert(Ad ad) {
-        try {
-            String insertQuery = "INSERT INTO ads(user_id, title, description, dateMade, catString) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement stmt = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
-            stmt.setLong(1, ad.getUserId());
-            stmt.setString(2, ad.getTitle());
-            stmt.setString(3, ad.getDescription());
-            stmt.setString(4, ad.getDateMade());
-            stmt.setString(5, ad.getCatString());
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            rs.next();
-            return rs.getLong(1);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error creating a new ad.", e);
         }
     }
 
@@ -112,134 +52,199 @@ public class MySQLAdsDao implements Ads {
                 rs.getLong("user_id"),
                 rs.getString("title"),
                 rs.getString("description"),
-                rs.getString("dateMade"),
-                rs.getString("catString")
+                rs.getString("location")
         );
     }
 
-    @Override
-    public List<Ad> getUserAds(Long id) throws SQLException {
-        DriverManager.registerDriver(new Driver());
-        connection = DriverManager.getConnection(
-                config.getUrl(),
-                config.getUser(),
-                config.getPassword()
-        );
-        String query = "SELECT * FROM ads WHERE user_id = ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setLong(1, id);
-
-        ResultSet rs = ps.executeQuery();
-        List<Ad> userAds = new ArrayList<>();
+    private List<Ad> createAdsFromResults(ResultSet rs) throws SQLException {
+        List<Ad> ads = new ArrayList<>();
         while (rs.next()) {
-            Ad ad = extractAd(rs);
-            userAds.add(ad); // inserts each add created the user made to List
-
+            ads.add(extractAd(rs));
         }
-        return userAds;
-    }
-
-
-    @Override
-    public String getCurrentDate() throws SQLException {
-        String query = "SELECT CURRENT_DATE AS date";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        return rs.getString("date");
+        return ads;
     }
 
     @Override
-    public int insertIntoAds(long user_id, String title, String description, String date, String categories) throws SQLException {
-        String query = "INSERT INTO ads (user_id, title, description, dateMade, catString) VALUES (? ,? ,?, ?, ?)";
-        PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-        ps.setLong(1, user_id);
-        ps.setString(2, title);
-        ps.setString(3, description);
-        ps.setString(4, date);
-        ps.setString(5, categories);
-        ps.executeUpdate();
-        ResultSet rs = ps.getGeneratedKeys();
-        rs.next();
-        return rs.getInt(1);
+    public Long insert(Ad ad) {
+        try {
+            String insertQuery = "INSERT INTO ads(user_id, title, description, price) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmt = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            stmt.setLong(1, ad.getUserId());
+            stmt.setString(2, ad.getTitle());
+            stmt.setString(3, ad.getDescription());
+            stmt.setDouble(4, Double.parseDouble(ad.getPrice()));
+            stmt.executeUpdate();
+            Long holder = Long.parseLong(ad.getCategory());
+            System.out.println("This is the value of the holder " + holder);
+            ResultSet rs = stmt.getGeneratedKeys();
+            rs.next();
+
+            System.out.println("rs.getLong(1) = " + rs.getLong(1));
+            System.out.println("rs.getString(1) = " + rs.getString(1));
+
+            insertMedia(ad.getLocation(),rs.getInt(1));
+            insertCat(rs.getInt(1),holder);
+
+            return rs.getLong(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error creating a new ad.", e);
+        }
     }
 
-    @Override
-    public int insertAdCategories(long ad_id, long cat_id) throws SQLException {
-        String query = "INSERT INTO adCategories (ad_id, category_id) VALUES (? ,?)";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setLong(1, ad_id);
-        ps.setLong(2, cat_id);
-        return ps.executeUpdate();
+    private void insertCat (int rs, Long cat) {
+        try {
+            String insertQuery = "INSERT INTO pivot_categories (ads_id, categories_id) VALUES (?,?)";
+            PreparedStatement stmt = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            stmt.setInt(1,rs);
+            stmt.setLong(2, cat);
+            stmt.executeUpdate();
+            ResultSet pr = stmt.getGeneratedKeys();
+            pr.next();
+        } catch (SQLException e){
+            throw new RuntimeException("Error adding category", e);
+        }
     }
 
-    @Override
-    public Ad createAdObject(long ad_id) throws SQLException {
-        String query = "SELECT *, users.username FROM ads\n" +
-                "JOIN users\n" +
-                "ON users.id = ads.user_id\n" +
-                "WHERE ads.id = ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setLong(1, ad_id);
-        ResultSet rs = ps.executeQuery();
-        rs.next();
-        Ad newAd = new Ad(
+    private void insertMedia (String location, int rs) {
+        try{
+            String insertQuery = "INSERT INTO media (location) VALUES (?)";
+            PreparedStatement stmt = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            stmt.setString(1,location);
+            stmt.executeUpdate();
+            ResultSet resultSet = stmt.getGeneratedKeys();
+            resultSet.next();
+            int media_id = resultSet.getInt(1);
+            insertQuery = "INSERT INTO pivot_media(media_id, ad_id) VALUES (?,?)";
+            stmt = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS);
+            stmt.setInt(1,media_id);
+            stmt.setInt(1,rs);
+            stmt.executeUpdate();
+        }catch (SQLException e){
+            throw new RuntimeException("Error adding file location", e);
+        }
+    }
+
+
+    public List<Ad> profileAds(String s) {
+        PreparedStatement stmt;
+        try {
+//            stmt = connection.prepareStatement("SELECT * FROM ads JOIN users ON ads.user_id = users.id WHERE username = ?");
+//            stmt = connection.prepareStatement("SELECT * FROM ads JOIN users ON ads.user_id = users.id JOIN pivot_media on ads.id = pivot_media.ad_id join media on pivot_media.media_id = media.id WHERE username = ?");
+            stmt = connection.prepareStatement("SELECT *   FROM ads JOIN users ON ads.user_id = users.id JOIN pivot_categories pc     ON ads.id = pc.ads_id   JOIN categories c     ON pc.categories_id = c.id   join pivot_media     on ads.id = pivot_media.ad_id   join media     on pivot_media.media_id = media.id where username=?");
+            stmt.setString(1, s);
+            ResultSet rs = stmt.executeQuery();
+            return createAdsForMain(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving all user ads.", e);
+        }
+    }
+
+//    private Ad extractAd(ResultSet rs) throws SQLException {
+//        return new Ad(
+//            rs.getLong("id"),
+//            rs.getLong("user_id"),
+//            rs.getString("title"),
+//            rs.getString("description"),
+//            rs.getString("price")
+//        );
+//    }
+
+    private Ad extractAdsforMain(ResultSet rs) throws SQLException {
+        return new Ad(
                 rs.getLong("id"),
+                rs.getLong("user_id"),
                 rs.getString("title"),
                 rs.getString("description"),
-                rs.getString("username"),
-                rs.getString("dateMade"),
-                rs.getString("catString")
+                rs.getString("category_name"),
+                rs.getString("price"),
+                rs.getString("location")
         );
-        return newAd;
     }
 
-    @Override
-    public int updateAd(String title, String description, long ad_id) throws SQLException {
-        String query = "UPDATE ads SET title = ?, description =  ? WHERE id = ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setString(1, title);
-        ps.setString(2, description);
-        ps.setLong(3, ad_id);
-        return ps.executeUpdate();
-    }
 
-    @Override
-    public int deleteAdFromAdTable(long ad_id) throws SQLException {
-        String query = "DELETE FROM ads WHERE id = ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setLong(1, ad_id);
-        return ps.executeUpdate();
-    }
-
-    public int deleteAdFromAdCategories(long ad_id) throws SQLException {
-        String query = "DELETE FROM adCategories WHERE ad_id = ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setLong(1, ad_id);
-        return ps.executeUpdate();
-    }
-
-    public List<Ad> findAdByKeyword(String keyword) throws SQLException {
-        String query = "SELECT *, users.username FROM ads\n" +
-                "JOIN users\n" +
-                "ON users.id = ads.user_id\n" +
-                "WHERE ads.title LIKE ?";
-        PreparedStatement ps = connection.prepareStatement(query);
-        ps.setString(1, "%" + keyword + "%");
-        ResultSet rs = ps.executeQuery();
-        List<Ad> keywordAds = new ArrayList<>();
+    private List<Ad> createAdsForMain(ResultSet rs) throws SQLException {
+        List<Ad> ads = new ArrayList<>();
         while (rs.next()) {
-            Ad newAd = new Ad(
-                    rs.getLong("id"),
-                    rs.getString("title"),
-                    rs.getString("description"),
-                    rs.getString("username"),
-                    rs.getString("dateMade"),
-                    rs.getString("catString")
-            );
-            keywordAds.add(newAd);
-
+            ads.add(extractAdsforMain(rs));
         }
-        return keywordAds;
+        return ads;
+    }
+
+    @Override
+    public List<Ad> searchedAds(String searchInput, String searchCat) {
+        System.out.println("searchInput = " + searchInput);
+        System.out.println("searchCat = " + searchCat);
+        PreparedStatement pst = null;
+        try {
+            pst = connection.prepareStatement("SELECT *   FROM ads JOIN users ON ads.user_id = users.id JOIN pivot_categories pc     ON ads.id = pc.ads_id   JOIN categories c     ON pc.categories_id = c.id   join pivot_media     on ads.id = pivot_media.ad_id   join media     on pivot_media.media_id = media.id WHERE ads.title LIKE  ?  AND c.category_name = ?");
+            pst.setString(1,"%" + searchInput + "%");
+            pst.setString(2, searchCat);
+            ResultSet rs = pst.executeQuery();
+            return createAdsForMain(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving matching ads.", e);
+        }
+    }
+
+
+    @Override
+    public List<Ad> individualAd(String adID) {
+        PreparedStatement pst = null;
+        try {
+
+//            pst = connection.prepareStatement("SELECT ads.*, c.category_name, location, ad_id FROM ads JOIN pivot_categories pc ON ads.id = pc.ads_id JOIN categories c ON pc.categories_id = c.id join pivot_media on ads.id = pivot_media.ad_id join media on pivot_media.media_id = media.id WHERE ads.id = ?");
+
+//            pst = connection.prepareStatement("SELECT * FROM ads WHERE id = ?");
+            pst = connection.prepareStatement("SELECT *   FROM ads   JOIN pivot_categories pc     ON ads.id = pc.ads_id   JOIN categories c     ON pc.categories_id = c.id   join pivot_media     on ads.id = pivot_media.ad_id   join media     on pivot_media.media_id = media.id where ads.id=?");
+
+            pst.setString(1, adID);
+            ResultSet rs = pst.executeQuery();
+            return createAdsForMain(rs);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving specific add", e);
+        }
+    }
+
+    @Override
+    public void titleChange(String title, String adId) {
+        String query = "UPDATE ads SET title = ? WHERE id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, title);
+            stmt.setInt(2, Integer.parseInt(adId));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error changing title.", e);
+        }
+    }
+
+
+    @Override
+    public void descriptionChange(String description, String adId) {
+        String query = "UPDATE ads SET description = ? WHERE id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, description);
+            stmt.setInt(2, Integer.parseInt(adId));
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error changing email.", e);
+        }
+    }
+
+    @Override
+    public void deleteAd(String adId) {
+        String query = "DELETE FROM ads WHERE id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, adId);
+            System.out.println(stmt);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQLState: " + e.getSQLState());
+            System.out.println("VendorError: " + e.getErrorCode());
+            throw new RuntimeException("Error deleting ad");
+        }
     }
 }

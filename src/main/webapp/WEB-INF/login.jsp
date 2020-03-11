@@ -1,38 +1,32 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
     <jsp:include page="/WEB-INF/partials/head.jsp">
         <jsp:param name="title" value="Please Log In" />
     </jsp:include>
-
 </head>
 <body>
-
-
-<jsp:include page="/WEB-INF/partials/navbar.jsp" />
-<div class="container">
-    <h1 class="loginHeading">Please Log In</h1>
-    <c:if test="${passwordMatch == false}">
-        <p style="color:red">Incorrect Password for this account. Please try again.</p>
-    </c:if>
-    <c:if test="${accountExists == false}">
-        <p style="color:red">Account does not exist. Please try again.</p>
-    </c:if>
-
-    <form action="/login" method="POST">
-        <div class="loginDiv">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input id="username" name="username" class="form-control loginInput" type="text">
+    <jsp:include page="/WEB-INF/partials/navbar.jsp" />
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-offset-4 col-xs-4">
+                <h1 style="text-align: center">Please Log In</h1>
+                ${username_error}
+                ${password_error}
+                <form action="/login" method="POST">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" class="form-control" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" class="form-control" type="password">
+                    </div>
+                    <input type="submit" class="btn btn-light" value="Log In">
+                </form>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password" name="password" class="form-control loginInput" type="password">
-            </div>
-            <input type="submit" class="btn btn-block loginBtn" value="Log In">
         </div>
-    </form>
-</div>
+    </div>
+    <jsp:include page="/WEB-INF/partials/scripts.jsp" />
 </body>
 </html>

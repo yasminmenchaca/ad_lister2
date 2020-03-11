@@ -1,123 +1,62 @@
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-
     <jsp:include page="/WEB-INF/partials/head.jsp">
-        <jsp:param name="title" value="Welcome to my site!" />
+        <jsp:param name="title" value="Ad Lister" />
     </jsp:include>
-    <link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-<jsp:include page="/WEB-INF/partials/navbar.jsp" />
-<div class="container">
-    <div class="row pt-3">
-        <div class="col-7 w-text">
-            <h1>Treasure Finder</h1>
-            <h4>Search For a Gem or Sell a Gem Here On Treasure Finder </h4>
+    <jsp:include page="/WEB-INF/partials/navbar.jsp" />
+    <header class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1>Welcome to Ad Lister</h1>
+                <h2>Sell, Trade, or Buy</h2>
+            </div>
         </div>
-        <div class="col-5">
-            <div class="card">
-                <div class="card-body reg">
-                    <h5 class="card-title font-weight-bold">Register, Post An Add And Turn Your Treasure Into Cash</h5>
-                    <p class="card-text">Sell and Buy</p>
-                    <form action="/register" method="GET">
-                        <a href="/register" class="btn btn-primary text-light blk" style="background:#d4372b">Register</a>
-                    </form>
+    </header>
+    <section class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 center-block">
+                <div class="slideshow-container">
+
+                    <!-- Full-width images with number and caption text -->
+                    <div class="mySlides fade">
+                        <div class="numbertext"></div>
+                        <img src="/Users/johnsantos/adLister/example1/AdLister/src/main/webapp/resources/img/Love_Seat.jpg" style="width:100%">
+                        <div class="text"></div>
+                    </div>
+
+                    <div class="mySlides fade">
+                        <div class="numbertext"></div>
+                        <img src="/Users/johnsantos/adLister/example1/AdLister/src/main/webapp/resources/img/66_camaro.jpg" style="width:100%">
+                        <div class="text"></div>
+                    </div>
+
+                    <div class="mySlides fade">
+                        <div class="numbertext"></div>
+                        <img src="/img/Love_Seat.jpg" style="width:100%">
+                        <div class="text"></div>
+                    </div>
+
+                    <!-- Next and previous buttons -->
+                    <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+                    <a class="next" onclick="plusSlides(1)">&#10095;</a>
+                </div>
+                <br>
+
+                <!-- The dots/circles -->
+                <div style="text-align:center">
+                    <span class="dot" onclick="currentSlide(1)"></span>
+                    <span class="dot" onclick="currentSlide(2)"></span>
+                    <span class="dot" onclick="currentSlide(3)"></span>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <form class="row pt-4" action="/ads" method="GET">
-        <a class="red-hover w-text" href="category?value=0">Recent Ads</a>
-    </form>
-    <div class="scrollBx ">
-        <c:forEach var="ad" items="${all}">
-            <a class="blk" href="/viewAd?adId=${ad.id}" class="dark">
-                <div class="cards mr-2">
-                    <h2>${ad.title}</h2>
-                    <p>${ad.description}</p>
-                    <p>Categories: ${ad.catString}</p>
-                    <br>
-                    <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
-                </div>
-            </a>
-        </c:forEach>
-    </div>
-
-    <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=1">Cars</a>
-    </form>
-    <div class="scrollBx">
-        <c:forEach var="ad" items="${cars}">
-            <a class="blk" href="/viewAd?adId=${ad.id}">
-                <div class="cards mr-2">
-                    <h2>${ad.title}</h2>
-                    <p>${ad.description}</p>
-                    <p>Categories: ${ad.catString}</p>
-                    <br>
-                    <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
-                </div>
-            </a>
-        </c:forEach>
-    </div>
-
-    <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=8"> Sporting</a>
-    </form>
-    <div class="scrollBx">
-        <c:forEach var="ad" items="${sporting}">
-            <a class="blk" href="/viewAd?adId=${ad.id}">
-                <div class="cards mr-2">
-                    <h2>${ad.title}</h2>
-                    <p>${ad.description}</p>
-                    <p>Categories: ${ad.catString}</p>
-                    <br>
-                    <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
-                </div>
-            </a>
-        </c:forEach>
-    </div>
-
-    <form class="row pt-4" action="/category" method="GET">
-        <a class="red-hover w-text" href="/category?value=2"> Collectibles</a>
-    </form>
-    <div class="scrollBx">
-        <c:forEach var="ad" items="${jobs}">
-            <a class="blk" href="/viewAd?adId=${ad.id}">
-                <div class="cards mr-2">
-                    <h2>${ad.title}</h2>
-                    <p>${ad.description}</p>
-                    <p>Categories: ${ad.catString}</p>
-                    <br>
-                    <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
-                </div>
-            </a>
-        </c:forEach>
-    </div>
-
-    <form class="row pt-4" action="category" method="GET">
-        <a class="red-hover w-text" href="/category?value=8"> Furniture</a>
-    </form>
-    <div class="scrollBx">
-        <c:forEach var="ad" items="${furniture}">
-            <a class="blk" href="/viewAd?adId=${ad.id}">
-                <div class="cards mr-2">
-                    <h2>${ad.title}</h2>
-                    <p>${ad.description}</p>
-                    <p>Categories: ${ad.catString}</p>
-                    <br>
-                    <p>Created by: ${ad.username} on, ${ad.dateMade} </p>
-                </div>
-            </a>
-        </c:forEach>
-    </div>
-
-    <%-- ALL OTHER PAGES NEED THIS TAG--%>
-    <jsp:include page="WEB-INF/partials/js-script.jsp" />
-    <jsp:include page="/WEB-INF/partials/footer.jsp" />
-</div>
+    <jsp:include page="/WEB-INF/partials/scripts.jsp" />
+    <script src="js/primary.js"></script>
 </body>
 </html>

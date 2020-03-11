@@ -7,24 +7,20 @@ public class User {
     private String username;
     private String email;
     private String password;
-    private String date;
 
     public User() {}
 
-    public User(String username, String email, String password, String date) {
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         setPassword(password);
-        this.date = date;
-
     }
 
-    public User(long id, String email, String username, String password, String date) {
+    public User(long id, String username, String email, String password) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.date = date;
     }
 
     public long getId() {
@@ -57,13 +53,5 @@ public class User {
 
     public void setPassword(String password) {
         this.password = Password.hash(password);
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 }
