@@ -24,19 +24,19 @@
                     <!-- Full-width images with number and caption text -->
                     <div class="mySlides fade">
                         <div class="numbertext"></div>
-                        <img src="/Users/johnsantos/adLister/example1/AdLister/src/main/webapp/resources/img/Love_Seat.jpg" style="width:100%">
+                        <img src="resources/img/harry_potter.jpg" style="width:100%">
                         <div class="text"></div>
                     </div>
 
                     <div class="mySlides fade">
                         <div class="numbertext"></div>
-                        <img src="/Users/johnsantos/adLister/example1/AdLister/src/main/webapp/resources/img/66_camaro.jpg" style="width:100%">
+                        <img src="resources/img/66_camaro.jpg" style="width:100%">
                         <div class="text"></div>
                     </div>
 
                     <div class="mySlides fade">
                         <div class="numbertext"></div>
-                        <img src="/img/Love_Seat.jpg" style="width:100%">
+                        <img src="resources/img/Love_Seat.jpg" style="width:100%">
                         <div class="text"></div>
                     </div>
 
